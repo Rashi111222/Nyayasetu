@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .models import Judgment, ActionPlan, OfficerReview
 from .utils.extractor import extract_text_from_pdf
-from .utils.gemini_service import extract_action_plan
+from .utils.groq_service import extract_action_plan
 
 
 def login_view(request):

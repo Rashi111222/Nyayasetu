@@ -3,8 +3,6 @@ import fitz  # PyMuPDF
 import pytesseract
 from pdf2image import convert_from_path
 
-# If you are on Windows, uncomment the line below
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def extract_text_from_pdf(pdf_path):
     """
@@ -14,13 +12,12 @@ def extract_text_from_pdf(pdf_path):
     text = ""
 
     try:
-        # Try direct text extraction
+        #  direct text extraction
         doc = fitz.open(pdf_path)
         for page in doc:
             text += page.get_text()
         doc.close()
 
-        # If we got enough text, return it directly
         if len(text.strip()) > 200:
             print("Digital PDF detected. Text extracted directly.")
             return text.strip()
@@ -28,7 +25,6 @@ def extract_text_from_pdf(pdf_path):
     except Exception as e:
         print(f"Direct extraction failed: {e}")
 
-    # Not enough text means it is a scanned PDF — run OCR
     print("Scanned PDF detected. Running OCR...")
 
     try:
