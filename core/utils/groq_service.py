@@ -5,10 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def extract_action_plan(text):
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 def extract_action_plan(raw_text):
+    client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+    
     prompt = f"""
 You are a legal assistant helping Indian government officials understand court judgments.
 
