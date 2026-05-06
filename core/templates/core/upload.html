@@ -1,1 +1,32 @@
- 
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header text-white fw-bold" style="background:#1a3a5c;">
+                📄 Upload Court Judgment PDF
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select PDF File</label>
+                        <input type="file" name="pdf" class="form-control" accept=".pdf" required>
+                        <small class="text-muted">Supports both digital and scanned PDFs. Max size: 20MB.</small>
+                    </div>
+                    <div class="alert alert-info">
+                        <strong>What happens next?</strong><br>
+                        1. Text is extracted from the PDF automatically<br>
+                        2. Gemini AI reads and extracts key information<br>
+                        3. You review and approve the action plan<br>
+                        4. Approved plan appears on the dashboard
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        Upload and Generate Action Plan
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

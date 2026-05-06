@@ -1,1 +1,136 @@
- 
+{% extends 'core/base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>⚖️ Department Dashboard</h4>
+    <a href="{% url 'upload' %}" class="btn btn-warning fw-bold">+ Upload New Judgment</a>
+</div>
+
+<!-- Stats Row -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-white shadow" style="background:#f59e0b;">
+            <div class="card-body text-center py-3">
+                <h2 class="fw-bold">{{ pending.count }}</h2>
+                <p class="mb-0">Pending Review</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white shadow" style="background:#10b981;">
+            <div class="card-body text-center py-3">
+                <h2 class="fw-bold">{{ approved.count }}</h2>
+                <p class="mb-0">Approved Plans</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white shadow" style="background:#ef4444;">
+            <div class="card-body text-center py-3">
+                <h2 class="fw-bold">{{ rejected.count }}</h2>
+                <p class="mb-0">Rejected</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Review Section -->
+{% if pending %}
+<h5 class="text-warning mb-3">⚠️ Needs Your Review</h5>
+{% for judgment in pending %}
+<div class="card mb-2 border-warning shadow-sm">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <strong>{{ judgment.case_number|default:"Case Number Pending" }}</strong>
+            <span class="text-muted ms-3 small">
+                Uploaded {{ judgment.uploaded_at|date:"d M Y, h:i A" }}
+            </span>
+        </div>
+        <a href="{% url 'review_plan' judgment.pk %}" class="btn btn-warning btn-sm fw-bold">
+            Review Now →
+        </a>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Approved Plans Section -->
+{% if approved %}
+<h5 class="text-success mt-4 mb-3">✓ Approved Action Plans</h5>
+{% for judgment in approved %}
+<div class="card mb-3 border-success shadow-sm">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <strong>{{ judgment.action_plan.case_number }}</strong>
+                <span class="text-muted ms-2 small">{{ judgment.action_plan.court_name }}</span>
+            </div>
+            <div>
+                {% if judgment.action_plan.appeal_recommended %}
+                <span class="badge bg-danger me-2">⚠ Appeal Flagged</span>
+                {% endif %}
+                <span class="badge bg-success">Approved</span>
+            </div>
+        </div>
+
+        <p class="text-muted small mt-1 mb-2">{{ judgment.action_plan.parties }}</p>
+        <p class="mb-2">{{ judgment.action_plan.judgment_summary|truncatewords:30 }}</p>
+
+        {% if judgment.action_plan.directives %}
+        <div class="mb-2">
+            <strong class="small">Required Actions:</strong>
+            {% for directive in judgment.action_plan.directives %}
+            <div class="d-flex align-items-start mt-1">
+                <span class="badge bg-primary me-2">{{ forloop.counter }}</span>
+                <span class="small">{{ directive }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if judgment.action_plan.compliance_deadline %}
+        <span class="badge bg-info text-dark">
+            📅 Deadline: {{ judgment.action_plan.compliance_deadline }}
+        </span>
+        {% endif %}
+
+        <div class="mt-2 small text-muted">
+            Reviewed by {{ judgment.action_plan.review.reviewed_by }} on
+            {{ judgment.action_plan.review.reviewed_at|date:"d M Y" }}
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Rejected Plans Section -->
+{% if rejected %}
+<h5 class="text-danger mt-4 mb-3">✗ Rejected Plans</h5>
+{% for judgment in rejected %}
+<div class="card mb-2 border-danger shadow-sm">
+    <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+            <strong>{{ judgment.case_number|default:"Unknown Case" }}</strong>
+            <span class="text-muted ms-3 small">
+                Rejected on {{ judgment.action_plan.review.reviewed_at|date:"d M Y" }}
+            </span>
+            {% if judgment.action_plan.review.notes %}
+            <div class="small text-muted mt-1">
+                Note: {{ judgment.action_plan.review.notes }}
+            </div>
+            {% endif %}
+        </div>
+        <span class="badge bg-danger">Rejected</span>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not pending and not approved and not rejected %}
+<div class="text-center mt-5 text-muted">
+    <h5>No judgments uploaded yet.</h5>
+    <p>Click "Upload New Judgment" to get started.</p>
+</div>
+{% endif %}
+
+{% endblock %} 

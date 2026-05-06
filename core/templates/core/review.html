@@ -1,1 +1,128 @@
- 
+{% extends 'core/base.html' %}
+{% block content %}
+<h5 class="mb-4">📋 Review AI-Generated Action Plan</h5>
+
+<div class="row">
+    <!-- Left: Original PDF -->
+    <div class="col-md-5">
+    <div class="card shadow h-100">
+        <div class="card-header text-white fw-bold" style="background:#1a3a5c;">
+            Original Judgment PDF
+        </div>
+        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+            <p class="text-muted mb-3">Click below to open the original judgment PDF</p>
+            <a href="/media/{{ judgment.uploaded_pdf.name }}" 
+               target="_blank" 
+               class="btn btn-primary btn-lg mb-3">
+                📄 Open Original PDF
+            </a>
+            <small class="text-muted text-center">
+                Opens in a new tab so you can review it alongside the action plan
+            </small>
+        </div>
+    </div>
+</div>
+
+    <!-- Right: AI Generated Plan -->
+    <div class="col-md-7">
+        <div class="card shadow">
+            <div class="card-header text-white fw-bold" style="background:#1a3a5c;">
+                AI-Generated Action Plan — Edit if Needed, Then Approve or Reject
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label fw-bold">Case Number</label>
+                            <input type="text" name="case_number" class="form-control"
+                                   value="{{ plan.case_number }}">
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-bold">Court Name</label>
+                            <input type="text" name="court_name" class="form-control"
+                                   value="{{ plan.court_name }}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Parties</label>
+                        <input type="text" class="form-control"
+                               value="{{ plan.parties }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Judgment Date</label>
+                        <input type="text" class="form-control"
+                               value="{{ plan.judgment_date }}" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Judgment Summary</label>
+                        <textarea name="judgment_summary" class="form-control"
+                                  rows="3">{{ plan.judgment_summary }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Required Actions</label>
+                        <div class="border rounded p-3 bg-light">
+                            {% for directive in plan.directives %}
+                            <div class="d-flex align-items-start mb-2">
+                                <span class="badge bg-primary me-2 mt-1">{{ forloop.counter }}</span>
+                                <span>{{ directive }}</span>
+                            </div>
+                            {% empty %}
+                            <span class="text-muted">No directives extracted</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label class="form-label fw-bold">Compliance Deadline</label>
+                            <input type="text" name="compliance_deadline" class="form-control"
+                                   value="{{ plan.compliance_deadline }}">
+                        </div>
+                        <div class="col">
+                            <label class="form-label fw-bold">Appeal Recommended?</label>
+                            <div class="form-check mt-2">
+                                <input type="checkbox" name="appeal_recommended"
+                                       class="form-check-input" id="appeal"
+                                       {% if plan.appeal_recommended %}checked{% endif %}>
+                                <label class="form-check-label" for="appeal">
+                                    Yes, flag for appeal
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Appeal Reason</label>
+                        <textarea name="appeal_reason" class="form-control"
+                                  rows="2">{{ plan.appeal_reason }}</textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Officer Notes (optional)</label>
+                        <textarea name="notes" class="form-control" rows="2"
+                                  placeholder="Any notes about this review..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="decision" value="approve"
+                                class="btn btn-approve flex-fill py-2 fw-bold">
+                            ✓ Approve and Publish
+                        </button>
+                        <button type="submit" name="decision" value="reject"
+                                class="btn btn-reject flex-fill py-2 fw-bold">
+                            ✗ Reject
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
